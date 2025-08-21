@@ -9,3 +9,5 @@ torchvision==0.17.2
 pyyaml>=6.0
 torch-geometric
 tqdm>=4.66
+papermill>=2.5
+jupyter

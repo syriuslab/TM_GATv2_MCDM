@@ -1,44 +1,69 @@
-# Fusion-WSN Graph Trust Framework
+# Fusion-WSN: Single-Notebook Reproducibility
 
-This repository contains the code and experiments for the paper **Trust-Aware Graph Learning for IoT/WSN**. It mirrors the simple, notebook-driven layout of the `syriuslab/fusion_framework` project while adapting it to a graph + trust pipeline.
+This repository reproduces the pipeline from the paper **Trust-Aware Graph Learning for IoT/WSN** using a **single notebook**:
+- `notebooks/TrustGNN_Fused_Pipeline_RIG.ipynb`
 
-## Branches
-- `main`: lightweight, code-only branch. Run all notebooks to reproduce results (datasets required).
-- `release`: includes processed artifacts (`data/processed/`) and trained models (`models/`) via **Git LFS** for quick evaluation.
+The layout mirrors the simplicity of `fusion_framework`, but **no notebook splitting** is required.
 
 ## Structure
 ```
 .
 ├── data/
-│   ├── raw/         # download public datasets here
+│   ├── raw/         # place/download the 4 public datasets here
 │   └── processed/   # generated artifacts (splits, standardized arrays, graphs)
-├── models/          # trained checkpoints (GNN, scalers)
+├── models/          # trained checkpoints (GNN, scalers) [optional]
+├── outputs/         # metrics, plots, tables exported by the notebook
 ├── notebooks/
-│   ├── 01_data_harmonization.ipynb
-│   ├── 02_graph_and_trust_build.ipynb
-│   ├── 03_gnn_training_and_evaluation.ipynb
-│   └── 04_results_figures_and_tables.ipynb
+│   └── TrustGNN_Fused_Pipeline_RIG.ipynb
+├── scripts/
+│   ├── install_pyg.sh
+│   └── run_notebook.sh
 ├── requirements.txt
-├── .gitattributes   # LFS patterns (release branch)
+├── environment.yml
+├── .gitattributes
 ├── .gitignore
+├── LICENSE
 └── README.md
 ```
 
 ## Setup
+
+### A) Conda (CPU baseline)
 ```bash
-python -m venv .venv && source .venv/bin/activate  # or conda
+conda env create -f environment.yml
+conda activate fusion-wsn
+pip install --index-url https://download.pytorch.org/whl/cpu torch==2.2.2 torchvision==0.17.2
+pip install pyg-lib torch-scatter torch-sparse torch-cluster torch-spline-conv torch-geometric \
+  -f https://data.pyg.org/whl/torch-2.2.2+cpu.html
 pip install -r requirements.txt
-# If PyG wheel fails, install matching wheel from https://data.pyg.org/whl/
 ```
 
-## Datasets
-Use four public IoT/WSN datasets as in the paper. Place raw files under `data/raw/<dataset_name>/`. The notebooks harmonize schemas, align UTC timestamps, perform leakage-safe splits, and build directed cosine kNN graphs.
+### B) Pip + GPU (CUDA 12.1, e.g., Colab Pro L4)
+```bash
+pip install --index-url https://download.pytorch.org/whl/cu121 torch==2.2.2 torchvision==0.17.2
+pip install pyg-lib torch-scatter torch-sparse torch-cluster torch-spline-conv torch-geometric \
+  -f https://data.pyg.org/whl/torch-2.2.2+cu121.html
+pip install -r requirements.txt
+```
 
-## Running
-Run notebooks in order:
-1. **01_data_harmonization.ipynb** — unify schemas, standardize features.
-2. **02_graph_and_trust_build.ipynb** — construct kNN graph; compute R, C, H, T.
-3. **03_gnn_training_and_evaluation.ipynb** — train GATv2; calibrate threshold (Eq. 7); export metrics/plots.
-4. **04_results_figures_and_tables.ipynb** — generate publication figures and tables.
+## Data
+- Use the **four public datasets** referenced in the paper; download them into `data/raw/` (subfolders per dataset).
+- The notebook harmonizes schemas, aligns UTC timestamps, performs leakage-safe splits, builds the directed cosine kNN graph, computes trust (R,C,H,T), trains GATv2, calibrates the threshold, and exports figures/tables.
+- Large files should **not** be committed. If you publish processed artifacts or models, use Git LFS and the `release` branch (see below).
 
-> GPU (e.g., NVIDIA L4) is recommended only for step 3; steps 1–2 run on CPU for energy efficiency.
+## Reproduce
+Open the notebook and **Run All**. For headless mode:
+```bash
+pip install papermill jupyter
+bash scripts/run_notebook.sh
+```
+
+Outputs (metrics, calibrated threshold, confusion matrices, ROC/PR, calibration plots) are saved under `outputs/`.
+
+## Branching
+- `main`: code + notebook only (no large files).
+- `release`: optional branch with `data/processed/` and `models/` tracked via **Git LFS** for quick evaluation.
+
+## Notes
+- Preprocessing/graph/trust on **CPU**, GNN training on **GPU** (L4) for best energy/runtime trade-off.
+- Seeds fixed; standardization fit on **training** only and reused elsewhere; graph uses `k=16` (ECO=`8`); threshold calibrated on validation and frozen.
