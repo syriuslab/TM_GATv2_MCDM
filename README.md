@@ -1,4 +1,4 @@
-# Fusion-WSN: Single-Notebook Reproducibility
+# Fusion-WSN: Enhancing Trust-Based Security in IoT-enabled WSNs using GATv2 with MCDM 
 
 This repository reproduces the pipeline from the paper **Trust-Aware Graph Learning for IoT/WSN** using a **single notebook**:
 - `notebooks/TrustGNN_Fused_Pipeline_RIG.ipynb`
