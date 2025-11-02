@@ -62,7 +62,7 @@ Outputs (metrics, calibrated threshold, confusion matrices, ROC/PR, calibration 
 
 ## Branching
 - `main`: code + notebook only (no large files).
-- `release`: optional branch with `data/processed/` and `models/` tracked via **Git LFS** for quick evaluation.
+- `release`: optional branch with `data/processed/` tracked via **Git LFS** for quick evaluation.
 
 ## Notes
 - Preprocessing/graph/trust on **CPU**, GNN training on **GPU** (L4) for best energy/runtime trade-off.
