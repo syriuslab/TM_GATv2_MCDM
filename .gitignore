@@ -5,10 +5,10 @@ __pycache__/
 .ipynb_checkpoints/
 
 # Data & outputs
-data/raw/
-data/processed/
-models/
-outputs/
+#data/raw/
+#data/processed/
+#models/
+#outputs/
 
 # OS/IDE
 .DS_Store
